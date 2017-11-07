@@ -114,7 +114,11 @@ long HX711::read_average(byte times) {
   long sum = 0;
 
   for (byte i = 0; i < times; i++) {
-    sum += read();
+    index++;
+
+    if (index >= valuesBufferSize) index = 0;
+    values[index] = read();
+    sum          += values[index];
     yield();
   }
   return sum / times;
