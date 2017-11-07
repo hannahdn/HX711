@@ -49,12 +49,14 @@ void HX711::set_gain(byte gain) {
   read();
 }
 
-void HX711::update() {
+bool HX711::update() {
   if (is_ready()) {
-    values[index] = read();
     index++;
 
-    if (index >= valuesBufferSize) index = 0; return true;
+    if (index >= valuesBufferSize) index = 0;
+
+    values[index] = read();
+    return true;
   }
   return false;
 }
@@ -99,7 +101,7 @@ long HX711::read() {
   return static_cast<long>(value);
 }
 
-long HX711::read_average() {
+long HX711::compute_average() {
   double sum = 0;
 
   for (unsigned int i = 0; i < valuesBufferSize; i++) {
@@ -108,16 +110,34 @@ long HX711::read_average() {
   return sum / valuesBufferSize;
 }
 
+long HX711::read_average(byte times) {
+  long sum = 0;
+
+  for (byte i = 0; i < times; i++) {
+    sum += read();
+    yield();
+  }
+  return sum / times;
+}
+
 double HX711::get_value() {
-  return read_average() - OFFSET;
+  return values[index - 1] - OFFSET;
+}
+
+double HX711::get_average_value() {
+  return compute_average() - OFFSET;
 }
 
 float HX711::get_units() {
   return get_value() / SCALE;
 }
 
-void HX711::tare() {
-  double sum = read_average();
+float HX711::get_average_units() {
+  return get_average_value() / SCALE;
+}
+
+void HX711::tare(byte times) {
+  double sum = read_average(times);
 
   set_offset(sum);
 }

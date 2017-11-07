@@ -54,20 +54,23 @@ public:
   long read();
 
   // returns an average reading; times = how many times to read
-  long read_average(byte times = 10);
+  long read_average(byte times);
+  long compute_average();
 
   // returns (read_average() - OFFSET), that is the current value without the
   // tare weight; times = how many readings to do
-  double get_value(byte times = 1);
+  double get_average_value();
+  double get_value();
 
   // returns get_value() divided by SCALE, that is the raw value divided by a
   // value obtained via calibration
   // times = how many readings to do
-  float get_units(byte times = 1);
+  float get_average_units();
+  float get_units();
 
   // set the OFFSET value for tare weight; times = how many times to read the
   // tare value
-  void tare(byte times = 10);
+  void tare(byte times);
 
   // set the SCALE value; this value is used to convert the raw data to "human
   // readable" data (measure units)
